@@ -8,7 +8,7 @@ public class CellController : MonoBehaviour
     [SerializeField] private SpriteRenderer _spriteRenderer = null;
 
     public Transform CellTransform => _cellTransform;
-
+    public CellsColorGroup CellsColorGroup => _cellsColorGroup;
     private CellsColorGroup _cellsColorGroup = null;
 
     public void SetCellColor(CellsColorGroup cellsColorGroup)

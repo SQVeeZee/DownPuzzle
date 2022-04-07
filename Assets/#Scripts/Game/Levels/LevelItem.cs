@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelItem : MonoBehaviour
@@ -11,6 +9,11 @@ public class LevelItem : MonoBehaviour
 
     private void Awake()
     {
-        _gameGridController.CreateFillGrid();
+        _gameGridController.CreateAndInitializeGrid();
+    }
+
+    private void OnLevelCompleted(ELevelCompleteReason levelCompleteReason)
+    {
+        onLevelComplete?.Invoke(levelCompleteReason);
     }
 }
