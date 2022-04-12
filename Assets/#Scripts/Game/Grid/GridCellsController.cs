@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class GridCellsController : MonoBehaviour
 {
+    public event Action onDisableCells = null;
+
+    private List<GridCell> _closestGridCells = new List<GridCell>();
+
     public void OnGridsCellInitialize(CellController cellController)
     {
 
@@ -11,19 +15,35 @@ public class GridCellsController : MonoBehaviour
 
     public void OnClickCell(GridCell gridCell)
     {
-        FindSameColorClosestCells(gridCell);
+        if(_closestGridCells.Count > 0)
+        {
+            if(_closestGridCells.Contains(gridCell))
+            {
+                 if(_closestGridCells.Count > 1)
+                    DisableCells(_closestGridCells);
+            }
+            else
+            {
+                UnSelectCells();
+
+                FindSameColorClosestCells(gridCell);
+            }
+        }
+        else
+        {
+            FindSameColorClosestCells(gridCell);
+        }
     }
 
     public void FindSameColorClosestCells(GridCell gridCell)
     {
         ECellsColor clickedCellColor = gridCell.CellController.CellsColorGroup.CellsColor;
-        List<GridCell> closestGridCells = new List<GridCell>();
 
-        closestGridCells.Add(gridCell);
+        _closestGridCells.Add(gridCell);
 
-        GetSameColorNeighbors(gridCell, closestGridCells);
+        GetSameColorNeighbors(gridCell, _closestGridCells);
 
-        DisableCells(closestGridCells);
+        SetClosestCellsSelectState(true);
 
         void GetSameColorNeighbors(GridCell checkedGridCell, List<GridCell> closestGridCells)
         {
@@ -41,7 +61,7 @@ public class GridCellsController : MonoBehaviour
             {
                 GridCell neighborGridCell = closestCell.Value;
 
-                if(closestGridCells.Contains(neighborGridCell)) continue;
+                if(closestGridCells.Contains(neighborGridCell) || neighborGridCell.CellController == null) continue;
 
                 if (neighborGridCell.CellController.CellsColorGroup.CellsColor == clickedCellColor)
                 {
@@ -57,37 +77,70 @@ public class GridCellsController : MonoBehaviour
                 {
                     GetSameColorNeighbors(closestGridCells[i], closestGridCells);
                 }
-
             }
         }
+    }
+
+    public GridCell TryGetTargetGridCell(GridCell movedCell, EDirectionType verticalDirectionType)
+    {
+        GridCell gridCellsPath = null;
+
+        if(!movedCell.ElementsInDirection.ContainsKey(verticalDirectionType)) return gridCellsPath;
+
+        gridCellsPath = GetVerticalTarget(movedCell, verticalDirectionType);
+
+        return gridCellsPath;
+    }
+
+    private void UnSelectCells()
+    {
+        SetClosestCellsSelectState(false);
+        _closestGridCells.Clear();
     }
 
     private void DisableCells(List<GridCell> closestCells)
     {
         foreach(var cell in closestCells)
         {
-            Debug.Log(cell.CellController.CellsColorGroup.CellsColor);
-
+            cell.CellController.DestroyCell();
+            cell.CellController = null;
             cell.CellType = ECellType.EMPTY;
-            cell.CellController.ResetColor();
+        }
+
+        closestCells.Clear();
+
+        onDisableCells?.Invoke();
+    }
+
+    private void SetClosestCellsSelectState(bool state)
+    {
+        foreach (var gridCell in _closestGridCells)
+        {
+            gridCell.CellController.SetSelectCellState(state);
         }
     }
-    
-    private GridCell GetUnderCellFreeCell(GridCell targetCell, Action callback)
+
+    private GridCell GetVerticalTarget(GridCell targetCell, EDirectionType verticalDirectionType)
     {
-        CellsLocalPosition cellsLocalPosition = targetCell.CellsLocalPosition;
+        List<GridCell> verticalMovePath = new List<GridCell>(); 
 
-        GridCell bottomCell = targetCell.ElementsInDirection[EDirectionType.BOTTOM];
+        GridCell neighborCellByDirection = targetCell.ElementsInDirection[verticalDirectionType];
 
-        if (bottomCell.CellType == ECellType.EMPTY)
+        if(neighborCellByDirection.CellType != ECellType.EMPTY) return null;
+        
+        verticalMovePath.Add(neighborCellByDirection);
+
+        while(neighborCellByDirection.CellType == ECellType.EMPTY)
         {
-            //GetUnderCellFreeCell(bottomCell, callback);
-        }
-        else
-        {
-            targetCell.MoveToGridCellByPath();
+            if(!neighborCellByDirection.ElementsInDirection.ContainsKey(verticalDirectionType)) return verticalMovePath[verticalMovePath.Count - 1];
+
+            neighborCellByDirection = neighborCellByDirection.ElementsInDirection[verticalDirectionType];
+            
+            if(neighborCellByDirection.CellType != ECellType.EMPTY) return verticalMovePath[verticalMovePath.Count - 1];
+            
+            verticalMovePath.Add(neighborCellByDirection);
         }
 
-        return bottomCell;
+        return verticalMovePath[verticalMovePath.Count - 1];
     }
 }

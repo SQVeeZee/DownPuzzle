@@ -4,10 +4,10 @@ using UnityEngine;
 public struct Direction
 {
     public EDirectionType DirectionType;
-
-    public bool TryGetGridLocalPositionByDirectionType(CellsLocalPosition gridPosition, EDirectionType directionType, Action<CellsLocalPosition> callback)
+    
+    public bool TryGetGridLocalPositionByDirectionType(CellsLocalPosition cellsLocalPosition, EDirectionType directionType, Action<CellsLocalPosition> callback)
     {
-        Vector2 localPosition = new Vector2(gridPosition.PositionX, gridPosition.PositionY);
+        Vector2 localPosition = new Vector2(cellsLocalPosition.PositionX, cellsLocalPosition.PositionY);
 
         switch (directionType)
         {
