@@ -92,7 +92,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _verticalDirectionType: 0
-  _horizontalDirectionType: 0
+  _horizontalDirectionType: 1
   _gridInitializer: {fileID: 3513947848159730943}
   _border: {fileID: 3513947847202818569}
   _gridCellsController: {fileID: 3513947847915184071}

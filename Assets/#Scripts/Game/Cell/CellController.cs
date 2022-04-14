@@ -31,7 +31,9 @@ public class CellController : MonoBehaviour
     {
         _spriteRenderer.color = Color.white;
 
-        _selectCellIdentifier.SetActive(false);
+        Destroy(gameObject);
+
+        //_selectCellIdentifier.SetActive(false);
     }
 
     public void SetSelectCellState(bool state)

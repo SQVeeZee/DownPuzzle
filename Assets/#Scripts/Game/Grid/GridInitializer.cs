@@ -56,14 +56,17 @@ public class GridInitializer : MonoBehaviour
         onSetCorners?.Invoke(extremePoints);
 
         Vector2 firstGlobalCellPosition = GetFirstElement(extremePoints, verticalDirectionType, horizontalDirectionType);
-
+        
+        int verticalIncreaser = GetSignForVerticalMove(verticalDirectionType);
+        int horizontalIncreaser = GetSignForHorizontalMove(horizontalDirectionType);
+        
         for (int i = 0; i < _width; i++)
         {
             for (int j = 0; j < _height; j++)
             {
                 CellsLocalPosition cellsLocalPosition = GetCellsLocalPosition(i, j);
 
-                var globalCellPosition = firstGlobalCellPosition + new Vector2(i, j) * _cellSize;
+                var globalCellPosition = firstGlobalCellPosition + new Vector2(i * horizontalIncreaser, j * verticalIncreaser) * _cellSize;
 
                 GridCell gridCell = GetNewFilledGridCell(globalCellPosition, cellsLocalPosition);
 
@@ -89,6 +92,27 @@ public class GridInitializer : MonoBehaviour
                 SetCellsNeighbors(gridCells, gridCells[i, j]);
             }
         }
+    }
+
+    private int GetSignForHorizontalMove(EHorizontalDirectionType horizontalDirectionType)
+    {
+        switch(horizontalDirectionType)
+        {
+            case EHorizontalDirectionType.LEFT: return 1;
+            case EHorizontalDirectionType.RIGHT: return -1;
+        }
+
+        return 0;
+    }
+    private int GetSignForVerticalMove(EVerticalDirectionType verticalDirectionType)
+    {
+        switch(verticalDirectionType)
+        {
+            case EVerticalDirectionType.DOWN: return 1;
+            case EVerticalDirectionType.TOP: return -1;
+        }
+
+        return 0;
     }
 
     private void SetCellsNeighbors(GridCell[,] gridCells, GridCell gridCell)
@@ -187,15 +211,15 @@ public class GridInitializer : MonoBehaviour
         }
         if(verticalDirectionType == EVerticalDirectionType.DOWN && horizontalDirectionType == EHorizontalDirectionType.RIGHT)
         {
-            return extremePoints[1, 0];
+            return extremePoints[1, 0] + new Vector2(-displacement.x, displacement.y);
         }
         if(verticalDirectionType == EVerticalDirectionType.TOP && horizontalDirectionType == EHorizontalDirectionType.LEFT)
         {
-            return extremePoints[0, 1];
+            return extremePoints[0, 1] + new Vector2(displacement.x, -displacement.y);
         }
-        if(verticalDirectionType == EVerticalDirectionType.DOWN && horizontalDirectionType == EHorizontalDirectionType.RIGHT)
+        if(verticalDirectionType == EVerticalDirectionType.TOP && horizontalDirectionType == EHorizontalDirectionType.RIGHT)
         {
-            return extremePoints[1, 1];
+            return extremePoints[1, 1] + new Vector2(-displacement.x, -displacement.y);;
         }
 
         return Vector2.zero;

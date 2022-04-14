@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: LevelItem
   m_EditorClassIdentifier: 
   _gridSize:
-    _width: 12
-    _height: 8
+    _width: 6
+    _height: 7

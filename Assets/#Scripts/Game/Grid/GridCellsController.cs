@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GridCellsController : MonoBehaviour
 {
-    public event Action onDisableCells = null;
+    public event Action<int> onDisableCells = null;
 
     private List<GridCell> _closestGridCells = new List<GridCell>();
 
@@ -26,24 +26,27 @@ public class GridCellsController : MonoBehaviour
             {
                 UnSelectCells();
 
-                FindSameColorClosestCells(gridCell);
+                FillClosestGridCells(gridCell, delegate { SetClosestCellsSelectState(true); });
             }
         }
         else
         {
-            FindSameColorClosestCells(gridCell);
+            FillClosestGridCells(gridCell, delegate { SetClosestCellsSelectState(true); });
         }
     }
 
-    public void FindSameColorClosestCells(GridCell gridCell)
+    private void FillClosestGridCells(GridCell gridCell, Action callback = null)
     {
-        ECellsColor clickedCellColor = gridCell.CellController.CellsColorGroup.CellsColor;
-
         _closestGridCells.Add(gridCell);
 
-        GetSameColorNeighbors(gridCell, _closestGridCells);
+        FindSameColorClosestCells(gridCell, _closestGridCells);
 
-        SetClosestCellsSelectState(true);
+        callback?.Invoke();
+    }
+
+    public void FindSameColorClosestCells(GridCell gridCell, List<GridCell> closestGridCells)
+    {
+        GetSameColorNeighbors(gridCell, closestGridCells);
 
         void GetSameColorNeighbors(GridCell checkedGridCell, List<GridCell> closestGridCells)
         {
@@ -63,7 +66,7 @@ public class GridCellsController : MonoBehaviour
 
                 if(closestGridCells.Contains(neighborGridCell) || neighborGridCell.CellController == null) continue;
 
-                if (neighborGridCell.CellController.CellsColorGroup.CellsColor == clickedCellColor)
+                if (neighborGridCell.CellController.CellsColorGroup.CellsColor == checkedGridCell.CellController.CellsColorGroup.CellsColor)
                 {
                     closestGridCells.Add(neighborGridCell);
                 }
@@ -100,6 +103,8 @@ public class GridCellsController : MonoBehaviour
 
     private void DisableCells(List<GridCell> closestCells)
     {
+        int cellsCount = closestCells.Count;
+
         foreach(var cell in closestCells)
         {
             cell.CellController.DestroyCell();
@@ -109,7 +114,7 @@ public class GridCellsController : MonoBehaviour
 
         closestCells.Clear();
 
-        onDisableCells?.Invoke();
+        onDisableCells?.Invoke(cellsCount);
     }
 
     private void SetClosestCellsSelectState(bool state)

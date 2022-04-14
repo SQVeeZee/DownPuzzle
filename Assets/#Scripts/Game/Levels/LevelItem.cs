@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class LevelItem : MonoBehaviour
 {
+    public event Action<int> onDisableCells = null;
     public event Action<ELevelCompleteReason> onLevelComplete = null;
 
     [Header("MoveType")]
@@ -79,11 +80,31 @@ public class LevelItem : MonoBehaviour
         _gridCellsController.OnClickCell(clickedGridCell);
     }
 
+    private void OnDisableCells(int disabledCellsCount)
+    {
+        onDisableCells?.Invoke(disabledCellsCount);
+
+        MoveCellsIfNeeded();
+    }
+
     private void MoveCellsIfNeeded()
     {
         List<GridCell> filledCells = GetFilledCells();
 
-        MoveVertical(delegate { MoveHorizontal(); });
+        MoveVertical(delegate { MoveHorizontal(OnCompleteMove); });
+
+        void OnCompleteMove()
+        {
+            DefineLevelState();
+        }
+    }
+
+    private void DefineLevelState()
+    {
+        if(IsLevelCompleted())
+        {
+            OnLevelCompleted(ELevelCompleteReason.WIN);
+        }
     }
 
     private void MoveHorizontal(Action callback = null)
@@ -162,8 +183,10 @@ public class LevelItem : MonoBehaviour
         {
             var targetGridCell = _gridCellsController.TryGetTargetGridCell(filledCell, EDirectionType.BOTTOM);
 
-            if(targetGridCell != null)
+            if(targetGridCell != null && filledCell != null)
             {
+                Debug.Log(filledCell + " FilledCell");
+
                 filledCell.CellController.AddElementToMovePath(targetGridCell);
 
                 movedCells.Add(filledCell.CellController);
@@ -173,17 +196,6 @@ public class LevelItem : MonoBehaviour
         }
 
         return movedCells;
-    }
-
-    private EDirectionType GetVerticalDirectionType(EVerticalDirectionType verticalDirectionType)
-    {
-        switch (verticalDirectionType)
-        {
-            case EVerticalDirectionType.DOWN: return EDirectionType.BOTTOM;
-            case EVerticalDirectionType.TOP: return EDirectionType.TOP;
-        }
-
-        return EDirectionType.NONE;
     }
 
     private List<CellController> GetHorizontalMoveCells(List<GridCell> filledCells)
@@ -291,6 +303,30 @@ public class LevelItem : MonoBehaviour
         return true;
     }
 
+    private bool IsLevelCompleted()
+    {
+        var filledCells = GetFilledCells();
+        List<GridCell> closestGridCells = new List<GridCell>();
+
+        if(filledCells.Count == 0)
+        {
+            return true;
+        }
+        else
+        {
+            foreach (var filledCell in filledCells)
+            {
+                _gridCellsController.FindSameColorClosestCells(filledCell, closestGridCells);
+
+                if(closestGridCells.Count > 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
     private void OnLevelCompleted(ELevelCompleteReason levelCompleteReason)
     {
         onLevelComplete?.Invoke(levelCompleteReason);
@@ -304,13 +340,13 @@ public class LevelItem : MonoBehaviour
     private void Subscribe()
     {
         _mobileInputController.onPointerDown += DetectClickedCell;
-        _gridCellsController.onDisableCells += MoveCellsIfNeeded;
+        _gridCellsController.onDisableCells += OnDisableCells;
         _gridInitializer.onSetCorners += SetupCorners;
     }
     private void UnSubscribe()
     {
         _mobileInputController.onPointerDown -= DetectClickedCell;
-        _gridCellsController.onDisableCells -= MoveCellsIfNeeded;
+        _gridCellsController.onDisableCells -= OnDisableCells;
         _gridInitializer.onSetCorners -= SetupCorners;
     }
 }

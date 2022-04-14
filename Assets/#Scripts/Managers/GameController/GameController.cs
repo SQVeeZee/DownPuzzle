@@ -6,8 +6,10 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] private LevelsController _levelsController = null;
     
-    void Awake()
+    void Start()
     {
+        UIManager.Instance.DisableScreens();
+        
         _levelsController.CreateLevel();
     }
 }
