@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4abcb1ad9d9f8044ac2eddb17c064e6, type: 3}
+  m_Name: TopRight_MovePattern
+  m_EditorClassIdentifier: 
+  _verticalMovePattern: {fileID: 11400000, guid: 049e9e19d55cdd8478503ec68e3701f1, type: 2}
+  _horizontalMovePattern: {fileID: 11400000, guid: 3c6428653f0de8744a4dc17537f09ce5, type: 2}

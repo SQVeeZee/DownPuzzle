@@ -14,17 +14,21 @@ public abstract class BaseScreen : MonoBehaviour, IScreen
     [SerializeField] private float _showTime = 0.5f;
     [SerializeField] private float _hideTime = 0.5f;
 
+    private Tweener _tweener = null;
+    
     public EScreenType ScreenType => _screenType;
 
     public void DoHide(bool force = false, Action callback = null)
     {
+        ResetTween();
+        
         if(force)
         {
            HideScreen();
         }
         else
         {
-            _canvasGroup.DOFade(0, _hideTime).OnComplete(HideScreen);
+            _tweener = _canvasGroup.DOFade(0, _hideTime).OnComplete(HideScreen);
         }
 
         void HideScreen()
@@ -39,6 +43,8 @@ public abstract class BaseScreen : MonoBehaviour, IScreen
 
     public void DoShow(bool force = false, Action callback = null)
     {
+        ResetTween();
+
         _canvasGroup.alpha = 0;
         _canvas.SetActive(true);
 
@@ -48,14 +54,20 @@ public abstract class BaseScreen : MonoBehaviour, IScreen
         }
         else
         {
-            _canvasGroup.DOFade(1, _showTime).OnComplete(ShowScreen);
+            _tweener = _canvasGroup.DOFade(1, _showTime).OnComplete(ShowScreen);
         }
 
         void ShowScreen()
         {
             _canvasGroup.alpha = 1;
-            
+
             callback?.Invoke();
         }
+    }
+
+    private void ResetTween()
+    {
+        _tweener?.Kill();
+        _tweener = null;
     }
 }

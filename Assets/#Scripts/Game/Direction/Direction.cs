@@ -1,42 +1,25 @@
-using System;
 using UnityEngine;
 
-public struct Direction
+public static class Direction
 {
-    public EDirectionType DirectionType;
-    
-    public bool TryGetGridLocalPositionByDirectionType(CellsLocalPosition cellsLocalPosition, EDirectionType directionType, Action<CellsLocalPosition> callback)
+    public static Position GetGridLocalPositionByDirectionType(CellPosition cellPosition, EDirectionType directionType)
     {
-        Vector2 localPosition = new Vector2(cellsLocalPosition.PositionX, cellsLocalPosition.PositionY);
+        Vector2 localPosition = cellPosition.GetVector2LocalPosition();
 
-        switch (directionType)
+        Vector2 directionVector = directionType switch
         {
-            case EDirectionType.RIGHT: 
-            return OnGetLocalPosition(ConvertVectorToGridPosition(localPosition + Vector2.right));
-            case EDirectionType.BOTTOM: 
-            return OnGetLocalPosition(ConvertVectorToGridPosition(localPosition + Vector2.down));
-            case EDirectionType.LEFT: 
-            return OnGetLocalPosition(ConvertVectorToGridPosition(localPosition + Vector2.left));
-            case EDirectionType.TOP: 
-            return OnGetLocalPosition(ConvertVectorToGridPosition(localPosition + Vector2.up));
-        }
-
-        return false;
+            EDirectionType.RIGHT => Vector2.right,
+            EDirectionType.BOTTOM => Vector2.down,
+            EDirectionType.LEFT => Vector2.left,
+            EDirectionType.TOP => Vector2.up,
+            
+            _ => Vector2.zero
+        };
         
-        bool OnGetLocalPosition(CellsLocalPosition cellsLocalPosition)
-        {
-            callback?.Invoke(cellsLocalPosition);
-            return true;
-        }
-    }
+        localPosition += directionVector;
 
-    private CellsLocalPosition ConvertVectorToGridPosition(Vector2 localPosition)
-    {
-        CellsLocalPosition gridPosition = new CellsLocalPosition();
+        Position position = new Position(localPosition);
 
-        gridPosition.PositionX = (int)localPosition.x;
-        gridPosition.PositionY = (int)localPosition.y;
-
-        return gridPosition;
+        return position;
     }
 }

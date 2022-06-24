@@ -1,70 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 
 public class UIGameScreen : BaseScreen
 {
     [Header("Score")]
     [SerializeField] private TextMeshProUGUI _scoreText = null;
     
-    private LevelsController _levelsController = null;
-
-    private int _currentScore = 0;
-
-    void Awake()
+    private void OnEnable()
     {
-        Initialize();
+        Subscribe();
     }
-
-    private void Initialize()
+    private void OnDisable()
     {
-        _levelsController = LevelsController.Instance;
-    }
-
-    void OnEnable()
-    {
-        _levelsController.onLevelItemSet += SubscribeOnLevelEvent;
-        _levelsController.onLevelItemDispose += UnSubscribeOnLevelEvent;
-    }
-
-    void OnDisable()
-    {
-        _levelsController.onLevelItemSet -= SubscribeOnLevelEvent;
-        _levelsController.onLevelItemDispose -= UnSubscribeOnLevelEvent;
+        Unsubscribe();
     }
     
-    private void SubscribeOnLevelEvent(LevelItem levelItem)
-    {
-        ResetScore();
+    private void SetScoreText(int score) => _scoreText.text = score.ToString(); 
 
-        levelItem.onDisableCells += UpdateScore;
+    
+    private void Subscribe()
+    {
+        ScoreSystem.onUpdateScore += SetScoreText;
     }
 
-    private void UnSubscribeOnLevelEvent(LevelItem levelItem)
+    private void Unsubscribe()
     {
-        levelItem.onDisableCells -= UpdateScore;
-    }
-
-    private void UpdateScore(int score)
-    {
-        _currentScore += score;
-
-        SetScoreText(_currentScore);
-    }
-
-    private void ResetScore()
-    {
-        _currentScore = 0;
-
-        SetScoreText(_currentScore);
-    }
-
-    private void SetScoreText(int score)
-    {
-        string scoreText = _currentScore.ToString();
-        
-        _scoreText.text = scoreText; 
+        ScoreSystem.onUpdateScore -= SetScoreText;
     }
 }

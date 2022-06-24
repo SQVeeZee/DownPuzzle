@@ -1,32 +1,37 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelsController : Singleton<LevelsController>
 {
+    public event Action<ELevelCompleteReason> onLevelCompleted = null;
     public event Action<LevelItem> onLevelItemSet = null;
     public event Action<LevelItem> onLevelItemDispose = null;
+    
     [SerializeField] private LevelItem _levelItemPrefab = null;
     
     [Header("Configs")]
     [SerializeField] private LevelsConfigs _levelsConfigs = null;
 
+    private GeneralLevelConfigs _generalLevelConfigs = null;
+    
     private LevelItem _currentLevelItem = null;
     private int _currentLevelNumber = 0;
 
+    public void Initialize(GeneralLevelConfigs generalLevelConfigs)
+    {
+        _generalLevelConfigs = generalLevelConfigs;
+    }
+    
     public void CreateLevel()
     {
-        InstantiateLevel();
+        _currentLevelItem = InstantiateLevel();
+        
+        _currentLevelItem.onLevelComplete += SendEventOnComplete;
         
         int currentLevelIndex = _currentLevelNumber % _levelsConfigs.LevelItems.Count;
 
-        _currentLevelItem.SetLevelItemConfig(_levelsConfigs.LevelItems[currentLevelIndex]);
+        _currentLevelItem.Initialize(_generalLevelConfigs, _levelsConfigs.LevelItems[currentLevelIndex]);
         
-        _currentLevelItem.onLevelComplete += OnLevelComplete;
-
-        UIManager.Instance.ShowScreen(EScreenType.GAME);
-
         onLevelItemSet?.Invoke(_currentLevelItem);
     }
 
@@ -41,32 +46,20 @@ public class LevelsController : Singleton<LevelsController>
 
     private void DestroyLevelIfNeeded()
     {
-        if(!IsCurrentLevelEmpty())
-        {
-            _currentLevelItem.onLevelComplete -= OnLevelComplete;
+        if (IsCurrentLevelEmpty()) return;
+        
+        _currentLevelItem.onLevelComplete -= SendEventOnComplete;
 
-            onLevelItemDispose?.Invoke(_currentLevelItem);
+        _currentLevelItem.Dispose();
+        
+        onLevelItemDispose?.Invoke(_currentLevelItem);
 
-            Destroy(_currentLevelItem.gameObject);
-        }
+        Destroy(_currentLevelItem.gameObject);
     }
 
-    private bool IsCurrentLevelEmpty()
-    {
-        if(_currentLevelItem != null)
-        {
-            return false;
-        }
-        return true;
-    }
+    private bool IsCurrentLevelEmpty() => _currentLevelItem == null;
+    private LevelItem InstantiateLevel() => Instantiate(_levelItemPrefab, transform);
 
-    private void InstantiateLevel()
-    {
-        _currentLevelItem = Instantiate(_levelItemPrefab, transform);
-    }
-
-    private void OnLevelComplete(ELevelCompleteReason levelCompleteReason)
-    {
-        UIManager.Instance.ShowScreen(EScreenType.WIN);
-    }
+    private void SendEventOnComplete(ELevelCompleteReason levelCompleteReason) => 
+        onLevelCompleted?.Invoke(levelCompleteReason);
 }

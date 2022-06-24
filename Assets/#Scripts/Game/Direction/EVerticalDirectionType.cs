@@ -1,5 +1,7 @@
 public enum EVerticalDirectionType
 {
-    DOWN = 0,
-    TOP = 1,
+    NONE = 0,
+    
+    DOWN = 1,
+    TOP = 2,
 }

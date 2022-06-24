@@ -10,5 +10,6 @@ public class CameraItem : MonoBehaviour, ICameraItem
 
     public ECameraType CameraType { get => _cameraType; }
     public Camera Camera => _camera;
-
+    
+    public Vector2 ConvertScreenToWorldPoint(Vector2 screenPoint) => _camera.ScreenToWorldPoint(screenPoint);
 }

@@ -1,14 +1,18 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 public class UIManager : Singleton<UIManager>
 {
     [SerializeField] private List<BaseScreen> _screens = new List<BaseScreen>();
-
+    
     private IScreen _currentScreen = null;
+    private GeneralUIConfigs _generalUIConfigs = null;
 
+    public void Initialize(GeneralUIConfigs generalUIConfigs)
+    {
+        _generalUIConfigs = generalUIConfigs;
+    }
+    
     public void ShowScreen(EScreenType screenType)
     {
         HideCurrentScreen();
@@ -16,6 +20,7 @@ public class UIManager : Singleton<UIManager>
         _currentScreen = GetScreen(screenType);
 
         _currentScreen.DoShow();
+        
     }
 
     public void DisableScreens()
@@ -26,13 +31,7 @@ public class UIManager : Singleton<UIManager>
         }
     }
 
-    private void HideCurrentScreen()
-    {
-        if(_currentScreen != null)
-        {
-            _currentScreen.DoHide();
-        } 
-    }
+    private void HideCurrentScreen() => _currentScreen?.DoHide();
 
     private IScreen GetScreen(EScreenType screenType)
     {
