@@ -1,24 +1,26 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
 public abstract class BaseScreen : MonoBehaviour, IScreen
 {
+    [Header("Screen")]
     [SerializeField] private EScreenType _screenType = EScreenType.NONE;
     [SerializeField] protected CanvasGroup _canvasGroup = null;
     [SerializeField] protected GameObject _canvas = null;
 
-    [Header("AnimationSettings")]
-    [SerializeField] private float _showTime = 0.5f;
-    [SerializeField] private float _hideTime = 0.5f;
+    private GeneralUIConfigs _generalUiConfigs = null; 
 
     private Tweener _tweener = null;
-    
-    public EScreenType ScreenType => _screenType;
 
-    public void DoHide(bool force = false, Action callback = null)
+    public EScreenType ScreenType => _screenType;
+    
+    public void Initialize(GeneralUIConfigs generalUiConfigs)
+    {
+        _generalUiConfigs = generalUiConfigs;
+    }
+    
+    public void DoHide(bool force = false, Action<IScreen> callback = null)
     {
         ResetTween();
         
@@ -28,7 +30,7 @@ public abstract class BaseScreen : MonoBehaviour, IScreen
         }
         else
         {
-            _tweener = _canvasGroup.DOFade(0, _hideTime).OnComplete(HideScreen);
+            _tweener = _canvasGroup.DOFade(0, _generalUiConfigs.HideTime).OnComplete(HideScreen);
         }
 
         void HideScreen()
@@ -36,12 +38,10 @@ public abstract class BaseScreen : MonoBehaviour, IScreen
             _canvasGroup.alpha = 0;
             _canvas.SetActive(false);
         
-            callback?.Invoke();
+            callback?.Invoke(this);
         }
     }
-
-
-    public void DoShow(bool force = false, Action callback = null)
+    public void DoShow(bool force = false, Action<IScreen> callback = null)
     {
         ResetTween();
 
@@ -54,17 +54,17 @@ public abstract class BaseScreen : MonoBehaviour, IScreen
         }
         else
         {
-            _tweener = _canvasGroup.DOFade(1, _showTime).OnComplete(ShowScreen);
+            _tweener = _canvasGroup.DOFade(1, _generalUiConfigs.ShowTime).OnComplete(ShowScreen);
         }
 
         void ShowScreen()
         {
             _canvasGroup.alpha = 1;
 
-            callback?.Invoke();
+            callback?.Invoke(this);
         }
     }
-
+    
     private void ResetTween()
     {
         _tweener?.Kill();

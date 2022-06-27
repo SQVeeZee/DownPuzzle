@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 1190907042155110103}
   - component: {fileID: 1190907042155110096}
   - component: {fileID: 1190907042155110097}
+  - component: {fileID: 6873092874058788838}
   m_Layer: 5
   m_Name: Next_Button
   m_TagString: Untagged
@@ -196,6 +197,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6873092874058788838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190907042155110099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a569638efd442034cab56df6245504c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _buttonType: 10
 --- !u!1 &1190907042880318504
 GameObject:
   m_ObjectHideFlags: 0
@@ -639,6 +653,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5872216968041966953}
   - component: {fileID: 6032120038723678900}
+  - component: {fileID: 6719321798456450099}
   m_Layer: 5
   m_Name: UIWinScreen
   m_TagString: Untagged
@@ -681,9 +696,19 @@ MonoBehaviour:
   _screenType: 2
   _canvasGroup: {fileID: 5872216966870126191}
   _canvas: {fileID: 5872216967641966921}
-  _showTime: 0.5
-  _hideTime: 0.5
   _nextButton: {fileID: 1190907042155110097}
+--- !u!114 &6719321798456450099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5872216968041966954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c39c52eec6ba06645b74a40498e0eee7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5872216968679602003
 GameObject:
   m_ObjectHideFlags: 0

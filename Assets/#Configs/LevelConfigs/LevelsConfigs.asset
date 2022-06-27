@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: LevelsConfigs
   m_EditorClassIdentifier: 
   _levelItems:
-  - {fileID: 11400000, guid: 13c2712c14ecb804589242c3f9e2bb0d, type: 2}
   - {fileID: 11400000, guid: 8f278675968180445b64795782090e21, type: 2}
   - {fileID: 11400000, guid: a102a3ee07980f446b28d355a116cd18, type: 2}
   - {fileID: 11400000, guid: 752cb6811b6193846992c5c2d8225292, type: 2}

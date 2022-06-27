@@ -1,26 +1,33 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIManager : Singleton<UIManager>
+public class UIManager : MonoBehaviour
 {
     [SerializeField] private List<BaseScreen> _screens = new List<BaseScreen>();
     
     private IScreen _currentScreen = null;
-    private GeneralUIConfigs _generalUIConfigs = null;
 
     public void Initialize(GeneralUIConfigs generalUIConfigs)
     {
-        _generalUIConfigs = generalUIConfigs;
+        foreach (var screen in _screens)
+        {
+            screen.Initialize(generalUIConfigs);
+        }
     }
     
-    public void ShowScreen(EScreenType screenType)
+    public void ShowScreen(EScreenType screenType, bool force = false, Action<IScreen> callback = null)
     {
         HideCurrentScreen();
 
         _currentScreen = GetScreen(screenType);
 
-        _currentScreen.DoShow();
-        
+        _currentScreen.DoShow(force, OnShow);
+
+        void OnShow(IScreen screen)
+        {
+            callback?.Invoke(screen);
+        }
     }
 
     public void DisableScreens()
@@ -32,7 +39,7 @@ public class UIManager : Singleton<UIManager>
     }
 
     private void HideCurrentScreen() => _currentScreen?.DoHide();
-
+    
     private IScreen GetScreen(EScreenType screenType)
     {
         foreach(IScreen screen in _screens)

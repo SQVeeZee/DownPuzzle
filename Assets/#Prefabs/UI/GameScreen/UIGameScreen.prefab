@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7817821043637849802}
   - component: {fileID: 514447655016022461}
   - component: {fileID: 4320094462749064044}
+  - component: {fileID: 6983530587338824748}
   m_Layer: 5
   m_Name: Number_Text
   m_TagString: Untagged
@@ -134,6 +135,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &6983530587338824748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2085897063327817118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 004d21753c5f3fd4e8826fb7db6f7770, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _textType: 10
 --- !u!1 &4513822102839290212
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,6 +358,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4513822103698732576}
   - component: {fileID: 3267905614772844233}
+  - component: {fileID: 4030618455594812966}
   m_Layer: 5
   m_Name: UIGameScreen
   m_TagString: Untagged
@@ -386,9 +401,18 @@ MonoBehaviour:
   _screenType: 1
   _canvasGroup: {fileID: 4513822104604218662}
   _canvas: {fileID: 4513822103295717888}
-  _showTime: 0.5
-  _hideTime: 0.5
-  _scoreText: {fileID: 4320094462749064044}
+--- !u!114 &4030618455594812966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4513822103698732579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8896e0e538e1aa74d87ae4ef51fed745, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4513822104604218664
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,7 +528,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Good clicks: '
+  m_text: 'Destroyed tiles: '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

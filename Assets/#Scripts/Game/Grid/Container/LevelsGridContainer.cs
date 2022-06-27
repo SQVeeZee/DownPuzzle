@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelsGridContainer : MonoBehaviour
+public class LevelsGridContainer
 {
-    [SerializeField] private GridInitializer _gridInitializer = null;
+    private readonly GridInitializer _gridInitializer = null;
 
     public GridCell[,] GetGrid() => _gridCells.Length > 0 ? _gridCells : throw new Exception("Can't get empty grid");
 
@@ -12,16 +12,19 @@ public class LevelsGridContainer : MonoBehaviour
 
     private int _width = 0;
     private int _height = 0;
-    
-    private void OnEnable()
+
+    public LevelsGridContainer(GridInitializer gridInitializer)
     {
-        Subscribe();
+        _gridInitializer = gridInitializer;
+        
+        _gridInitializer.onGridCreated += OnGridCreated;
     }
 
-    private void OnDisable()
+    ~LevelsGridContainer()
     {
-        UnSubscribe();
+        _gridInitializer.onGridCreated -= OnGridCreated;
     }
+    
 
     public List<GridCell> GetFilledCells()
     {
@@ -67,15 +70,5 @@ public class LevelsGridContainer : MonoBehaviour
         
         _width = _gridCells.GetUpperBound(0) + 1;
         _height = _gridCells.Length / _width;
-    }
-
-    private void Subscribe()
-    {
-        _gridInitializer.onGridCreated += OnGridCreated;
-    }
-
-    private void UnSubscribe()
-    {
-        _gridInitializer.onGridCreated -= OnGridCreated;
     }
 }

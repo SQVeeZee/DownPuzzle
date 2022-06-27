@@ -1,53 +1,29 @@
 using System;
-using UnityEngine;
 
-public class ClickHandler : MonoBehaviour
+public class ClickHandler: IDisposable
 {
-    public event Action<Vector2, float> onClick = default;
+    public event Action<UnityEngine.Vector2, float> onClick = default;
 
-    private MobileInputController _mobileInputController = null;
-    private ICameraItem _gameCamera = null;
+    private readonly MobileInputController _mobileInputController = null;
+    private readonly ICameraItem _gameCamera = null;
+    private readonly float _clickDistance = default;
 
-    private float _clickDistance = default;
-
-    private void Awake()
+    public ClickHandler(CellSetting cellSetting)
     {
-        SetData();
-    }
-    
-    public void SetClickDistance(CellSetting cellSetting) => _clickDistance = cellSetting.CellSize.x / 2;
-
-    private void SetData()
-    {
-        _mobileInputController = MobileInputController.Instance;
+        _clickDistance = cellSetting.CellSize.x / 2;
         
+        _mobileInputController = MobileInputController.Instance;
         _gameCamera = CameraManager.Instance.GetCameraItem(ECameraType.GAME);
     }
+
+    public void Initialize() => _mobileInputController.onPointerDown += DetectClickedCell;
+
+    public void Dispose() => _mobileInputController.onPointerDown -= DetectClickedCell;
     
-    private void DetectClickedCell(Vector2 inputPosition)
+    private void DetectClickedCell(UnityEngine.Vector2 inputPosition)
     {
         var worldPosition = _gameCamera.ConvertScreenToWorldPoint(inputPosition);
         
         onClick?.Invoke(worldPosition, _clickDistance);
-    }
-    
-    private void OnEnable()
-    {
-        Subscribe();   
-    }
-
-    private void OnDisable()
-    {
-        UnSubscribe();
-    }
-
-    private void Subscribe()
-    {
-        _mobileInputController.onPointerDown += DetectClickedCell;
-    }
-
-    private void UnSubscribe()
-    {
-        _mobileInputController.onPointerDown -= DetectClickedCell;
     }
 }

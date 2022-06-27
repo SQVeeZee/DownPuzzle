@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: GridConfigs
   m_EditorClassIdentifier: 
   _clampX: 0.15
-  _minClampY: 0.5
+  _minClampY: 0.2
   _maxClampY: 0.9

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using UniRx;
+using UnityEngine;
 
 public class ElementsSelectionController
 {
@@ -11,12 +13,18 @@ public class ElementsSelectionController
     private int SelectedCount => _selectedElements.Count;
 
     private int _minGroupSizeForDisabling = 2;
-
-    public ElementsSelectionController()
+    private ScoreSystem _scoreSystem = null;
+    
+    private ElementsSelectionController()
     {
         _closestCellsController = new ClosestCellsController();
 
         _closestCellsController.onSelectElements += InitializeSelectedElements;
+    }
+
+    public ElementsSelectionController(ScoreSystem scoreSystem): this()
+    {
+        _scoreSystem = scoreSystem;
     }
 
     ~ElementsSelectionController()
@@ -53,12 +61,14 @@ public class ElementsSelectionController
     private void UpdateSelection(GridCell gridCell)
     {
         UnSelectCells();
-            
+
         SelectCells(gridCell);
     }
     
     private void SelectCells(GridCell gridCell)
     {
+        if (gridCell.CellState != ECellState.FILL) return;
+
         _closestCellsController.SetClickedCell(gridCell);
         
         SetElementsSelectState(true);
@@ -80,11 +90,10 @@ public class ElementsSelectionController
             if (element is MovableElement movableElement)
             {
                 movableElement.DestroyCell();
-                selectedElement.Element = null;
             }
         }
 
-        ScoreSystem.UpdateScore(SelectedCount);
+        _scoreSystem.UpdateScore(SelectedCount);
         
         ClearSelectedGroup();
     }

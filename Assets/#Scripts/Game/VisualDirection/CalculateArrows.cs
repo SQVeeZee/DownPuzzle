@@ -10,8 +10,7 @@ public class CalculateArrows
         _arrowSize = GetArrowSize();
     }
     
-    public int CalculateArrowsCount(float gridLength) => 
-        (int)(gridLength / (_arrowSize + _ditanceBetweenArrows));
+    public int CalculateArrowsCount(float gridLength) => (int)(gridLength / (_arrowSize + _ditanceBetweenArrows));
 
     private float GetArrowSize()
     {

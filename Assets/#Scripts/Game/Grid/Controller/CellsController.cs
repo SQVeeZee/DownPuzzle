@@ -1,44 +1,50 @@
 using System;
 using UnityEngine;
 
-public class CellsController : MonoBehaviour, IDisposable
+public class CellsController : IDisposable
 {
     private readonly CellsMoveController _cellsMoveController;
-    private readonly ElementsSelectionController _elementsSelectionController = null;
+
+    private ElementsSelectionController _elementsSelectionController = null;
     
-    [SerializeField] private LevelsGridContainer _levelsGridContainer = null;
+    private LevelsGridContainer _levelsGridContainer = null;
     
-    [Header("Handler")]
-    [SerializeField] private ClickHandler _clickHandler = null;
+    private ClickHandler _clickHandler = null;
 
     private LevelCompleteController _levelCompleteController = null;
 
-    private CellsController()
+    public CellsController()
     {
         _cellsMoveController = new CellsMoveController();
-        _elementsSelectionController = new ElementsSelectionController();
     }
     
-    public void Initialize(LevelCompleteController levelCompleteController, MovePattern movePattern)
+    public void Initialize(
+        ClickHandler clickHandler, LevelsGridContainer levelsGridContainer, 
+        LevelCompleteController levelCompleteController, 
+        MovePattern movePattern, ScoreSystem scoreSystem)
     {
+        _elementsSelectionController = new ElementsSelectionController(scoreSystem);
+        
+        _clickHandler = clickHandler;
+
+        _levelsGridContainer = levelsGridContainer;
+        
         _cellsMoveController.Initialize(_levelsGridContainer.GetGrid(), movePattern);
         
         _levelCompleteController = levelCompleteController;
         
+        _cellsMoveController.onMoveCompleted += OnMoveCompleted;
         _elementsSelectionController.onDisablingCells += MoveCells;
-    }
-    
-    public void Dispose() => _elementsSelectionController.onDisablingCells -= MoveCells;
 
-    
-    private void OnEnable()
-    {
-        Subscribe();
+        _clickHandler.onClick += OnClick;
     }
 
-    private void OnDisable()
+    public void Dispose()
     {
-        Unsubscribe();
+        _cellsMoveController.onMoveCompleted -= OnMoveCompleted;
+        _elementsSelectionController.onDisablingCells -= MoveCells;
+
+        _clickHandler.onClick -= OnClick;
     }
 
     private void MoveCells() => _cellsMoveController.MoveCells();
@@ -50,19 +56,5 @@ public class CellsController : MonoBehaviour, IDisposable
         {
             _elementsSelectionController.DefineRuleBasedOnClickedCell(gridCell);
         }
-    }
-    
-    void Subscribe()
-    {
-        _cellsMoveController.onMoveCompleted += OnMoveCompleted;
-        
-        _clickHandler.onClick += OnClick;
-    }
-    
-    void Unsubscribe()
-    {
-        _cellsMoveController.onMoveCompleted -= OnMoveCompleted;
-        
-        _clickHandler.onClick -= OnClick;
     }
 }

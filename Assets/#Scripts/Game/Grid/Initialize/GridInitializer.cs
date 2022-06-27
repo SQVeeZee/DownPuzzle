@@ -1,25 +1,42 @@
 using System;
 using UnityEngine;
 
-public class GridInitializer : MonoBehaviour, IGridInitializer
+public class GridInitializer: IGridInitializer
 {
     public event Action<GridCell[,]> onGridCreated;
 
-    [SerializeField] private ElementsFactory _elementsFactory = null;
-        
-    public void InitializeGrid(ExtremePointsDetection extremePointsDetection, LevelItemConfigs levelItemConfigs, CellSetting cellSetting)
+    private readonly ElementsFactory _elementsFactory = null;
+
+    private readonly ExtremePointsDetection _extremePointsDetection = null;
+    private readonly LevelItemConfigs _levelItemConfigs = null;
+    
+    private CellSetting _cellSetting;
+    public GridInitializer(
+        ElementsFactory elementsFactory,
+        ExtremePointsDetection extremePointsDetection, 
+        LevelItemConfigs levelItemConfigs, 
+        CellSetting cellSetting)
     {
-        GridSize gridSize = levelItemConfigs.GridSize;
+        _elementsFactory = elementsFactory;
+        _extremePointsDetection = extremePointsDetection;
+        _levelItemConfigs = levelItemConfigs;
+        
+        _cellSetting = cellSetting;
+    }
+
+    public void InitializeGrid()
+    {
+        GridSize gridSize = _levelItemConfigs.GridSize;
         
         if(!CanCreateGrid(gridSize)) return;
         
-        EVerticalDirectionType verticalDirectionType = levelItemConfigs.MovePattern.VerticalMovePattern.VerticalDirectionType;
-        EHorizontalDirectionType horizontalDirectionType = levelItemConfigs.MovePattern.HorizontalMovePattern.HorizontalDirectionType;
+        EVerticalDirectionType verticalDirectionType = _levelItemConfigs.MovePattern.VerticalMovePattern.VerticalDirectionType;
+        EHorizontalDirectionType horizontalDirectionType = _levelItemConfigs.MovePattern.HorizontalMovePattern.HorizontalDirectionType;
         
         GridCell [,] gridCells = new GridCell[gridSize.Width, gridSize.Height];
 
-        Vector2 extremePoint = GetExtremePoint(extremePointsDetection.ExtremeWorldPoints, verticalDirectionType, horizontalDirectionType);
-        Vector2 displacement = GetDisplacement(cellSetting, verticalDirectionType, horizontalDirectionType);
+        Vector2 extremePoint = GetExtremePoint(_extremePointsDetection.ExtremeWorldPoints, verticalDirectionType, horizontalDirectionType);
+        Vector2 displacement = GetDisplacement(_cellSetting, verticalDirectionType, horizontalDirectionType);
         
         Vector2 firstGlobalCellPosition = extremePoint + displacement;
         
@@ -30,13 +47,13 @@ public class GridInitializer : MonoBehaviour, IGridInitializer
         {
             for (int j = 0; j < gridSize.Height; j++)
             {
-                Vector2 globalCellPosition = DefineGlobalPositionByIndexes(i, j, cellSetting);
+                Vector2 globalCellPosition = DefineGlobalPositionByIndexes(i, j, _cellSetting);
                 
                 CellPosition cellPosition = GetCellsPositions(globalCellPosition, new Vector2(i, j));
-
-                IElement element = _elementsFactory.CreateElement(EElementType.MOVABLE, globalCellPosition, cellSetting.CellSize);
+                GridCell gridCell = new GridCell(cellPosition);
                 
-                GridCell gridCell = GetGridCell(element, cellPosition);
+                IElement element = _elementsFactory.CreateElement(EElementType.MOVABLE, globalCellPosition, _cellSetting.CellSize);
+                gridCell.SetElement(element);
                 
                 gridCells[i, j] = gridCell;
             }
@@ -54,9 +71,6 @@ public class GridInitializer : MonoBehaviour, IGridInitializer
             return globalPosition;
         }
     }
-
-    private GridCell GetGridCell(IElement element, CellPosition cellPosition) =>
-        new CellsCreator().GetNewCell(element, cellPosition);
     
     private static bool CanCreateGrid(GridSize gridSize)
     {

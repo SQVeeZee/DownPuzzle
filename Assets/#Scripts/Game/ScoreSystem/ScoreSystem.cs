@@ -1,21 +1,27 @@
-using System;
+using UniRx;
 
-public static class ScoreSystem
+public class ScoreSystem
 {
-    public static event Action<int> onUpdateScore;
-
-    private static int _currentScore = 0;
-
-    private static void ResetScore() => _currentScore = 0;
-
-    public static void UpdateScore(int score)
+    public ScoreSystem(int score)
     {
-        _currentScore += CalculateExtraScore(score);
-        
-        onUpdateScore?.Invoke(_currentScore);
+        CurrentScore = new ReactiveProperty<int>(score);
     }
 
-    private static int CalculateExtraScore(int score)
+    public ScoreSystem()
+    {
+        CurrentScore = new ReactiveProperty<int>(0);
+    }
+    
+    public ReactiveProperty<int> CurrentScore { get; }
+
+    public void ResetScore() => CurrentScore.Value = 0;
+
+    public void UpdateScore(int score)
+    {
+        CurrentScore.Value += CalculateExtraScore(score);
+    }
+
+    private int CalculateExtraScore(int score)
     {
 
         return score;

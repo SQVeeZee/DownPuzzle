@@ -37,10 +37,4 @@ public class MovableElement : BaseElement
         _movePresenter.MoveToTarget(directionMoveType, callback);
 
     #endregion
-
-    
-    public void DestroyCell()
-    {
-        Destroy(gameObject);
-    }
 }

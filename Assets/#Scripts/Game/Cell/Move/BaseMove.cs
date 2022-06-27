@@ -23,8 +23,8 @@ public abstract class BaseMove : IMove
     
     protected void UpdateCellsInfo(GridCell movedCell, GridCell targetCell)
     {
-        targetCell.Element = movedCell.Element;
-        movedCell.Element = null;
+        targetCell.SetElement(movedCell.Element);
+        movedCell.RemoveElement();
     }
 
     public void Move()
