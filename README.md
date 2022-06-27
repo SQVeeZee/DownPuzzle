@@ -1,2 +1,3 @@
 # DownPuzzle
-![ezgif com-gif-maker](https://user-images.githubusercontent.com/60689487/175883838-73a5ee27-3510-4966-bfc3-2ab40932435d.gif)
+
+![gif_1](https://user-images.githubusercontent.com/60689487/175884479-2dd19430-3080-46b3-a118-6611815fabed.gif)
