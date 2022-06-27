@@ -13,14 +13,9 @@ public class UITextHandler : MonoBehaviour,IUIElementsHandler
         GAME_SCORE = 10,
     }
 
-    private void Awake()
-    {
-        RegisterText();
-    }
-
     private Dictionary<EUITextType, UIText> _textGroup;
 
-    private void RegisterText()
+    public void Register()
     {
         _textGroup = new Dictionary<EUITextType, UIText>();
         var uiTexts = GetComponentsInChildren<UIText>();

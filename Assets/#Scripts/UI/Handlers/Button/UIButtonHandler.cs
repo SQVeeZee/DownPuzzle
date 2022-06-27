@@ -13,15 +13,10 @@ public class UIButtonHandler : MonoBehaviour, IUIElementsHandler
     
     private Dictionary<EUIButtonType, UIButton> _buttonGroup;
     
-    private void Awake()
-    {
-        RegisterButton();
-    }
-
     public void Subscribe(EUIButtonType buttonType, UnityAction callback) =>
         GetButton(buttonType).AddListener(callback);
 
-    private void RegisterButton()
+    public void Register()
     {
         _buttonGroup = new Dictionary<EUIButtonType, UIButton>();
         var uiButtons = GetComponentsInChildren<UIButton>();

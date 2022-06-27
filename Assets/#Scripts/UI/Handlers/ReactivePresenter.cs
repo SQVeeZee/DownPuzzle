@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ReactivePresenter: MonoBehaviour
@@ -7,32 +8,44 @@ public class ReactivePresenter: MonoBehaviour
    private LevelsController _levelsController = null;
    
    public ScoreSystem ScoreSystem { get; private set; }
+
+   private List<IUIElementsHandler> _elementsHandlers = new List<IUIElementsHandler>();
    
    public void Initialize(LevelsController levelsController)
    {
+      Initialize();
+      
       ScoreSystem = new ScoreSystem();
-      _levelsController = levelsController;      
+      _levelsController = levelsController;
       
       Register();
    }
 
-   private void Register()
-   {
-      RegisterTextUpdate();
-   }
-
-   private void RegisterTextUpdate()
+   private void Initialize()
    {
       foreach (Transform screenTransform in _screensRoot)
       {
-         if (TryToGetHandler(screenTransform, out UITextHandler textHandler))
+         if (TryToGetHandler(screenTransform, out IUIElementsHandler handler))
          {
-            textHandler.Subscribe(UITextHandler.EUITextType.GAME_SCORE, ScoreSystem.CurrentScore);
+            handler.Register();
+            
+            _elementsHandlers.Add(handler);
          }
+      }
+   }
 
-         if (TryToGetHandler(screenTransform, out UIButtonHandler buttonHandler))
+   private void Register()
+   {
+      foreach (IUIElementsHandler elementsHandler in _elementsHandlers)
+      {
+         switch (elementsHandler)
          {
-            buttonHandler.Subscribe(UIButtonHandler.EUIButtonType.WIN_CONTINUE, _levelsController.GoToNextLevel);
+            case UITextHandler textHandler:
+               textHandler.Subscribe(UITextHandler.EUITextType.GAME_SCORE, ScoreSystem.CurrentScore);
+               break;
+            case UIButtonHandler buttonHandler:
+               buttonHandler.Subscribe(UIButtonHandler.EUIButtonType.WIN_CONTINUE, _levelsController.GoToNextLevel);
+               break;
          }
       }
    }
