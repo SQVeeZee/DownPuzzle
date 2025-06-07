@@ -1,5 +1,6 @@
 using System;
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class MoveElementController : MonoBehaviour
@@ -7,7 +8,7 @@ public class MoveElementController : MonoBehaviour
     private GridCell _targetGridCell = null;
 
     private Transform _elementTransform = null;
-    private Coroutine _moveCoroutine = null;
+    private CancellationTokenSource _moveCancellationTokenSource = null;
     
     public void Initialize(Transform elementTransform)
     {
@@ -28,32 +29,40 @@ public class MoveElementController : MonoBehaviour
 
         Vector2 targetMovePosition = GetTargetMovePosition(directionMoveType);
 
-        _moveCoroutine = StartCoroutine(DoMove(targetMovePosition, moveElementModel.MoveSpeed, OnFinishMove));
+        _moveCancellationTokenSource = new CancellationTokenSource();
+
+        MoveAsync(_moveCancellationTokenSource.Token).Forget();
+
+        async UniTaskVoid MoveAsync(CancellationToken token)
+        {
+            await DoMove(targetMovePosition, moveElementModel.MoveSpeed, token);
+            OnFinishMove();
+        }
 
         void OnFinishMove()
         {
             ResetTargetCell();
-            
+
             callback?.Invoke();
         }
     }
 
-    private IEnumerator DoMove(Vector2 targetPosition, float speedMultiply, Action callback)
+    private async UniTask DoMove(Vector2 targetPosition, float speedMultiply, CancellationToken token)
     {
-        float time = 0;
+        float time = 0f;
 
         while (time < 1f)
         {
+            token.ThrowIfCancellationRequested();
+
             time += Time.deltaTime * speedMultiply;
-            
+
             _elementTransform.position = Vector2.MoveTowards(_elementTransform.position, targetPosition, time);
-            
-            yield return 0;
+
+            await UniTask.Yield();
         }
-        
+
         _elementTransform.position = targetPosition;
-        
-        callback?.Invoke();
     }
     
     private Vector2 GetTargetMovePosition(EDirectionMoveType directionMoveType)
@@ -71,10 +80,11 @@ public class MoveElementController : MonoBehaviour
 
     private void ResetMoveIfNeeded()
     {
-        if(_moveCoroutine == null) return;
-        
-        StopCoroutine(_moveCoroutine);
-        _moveCoroutine = null;
+        if(_moveCancellationTokenSource == null) return;
+
+        _moveCancellationTokenSource.Cancel();
+        _moveCancellationTokenSource.Dispose();
+        _moveCancellationTokenSource = null;
     }
 
     private void ResetTargetCell() => _targetGridCell = null;
